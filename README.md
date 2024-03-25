@@ -1,19 +1,31 @@
 # d7012e
 
-Install Haskell and cabal:
+## Install haskell
 
 ```
 sudo apt update
-sudo apt install ghc
-sudo apt install cabal-install
+curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | sh
 ```
 
-Compile and run:
+## Cabal
 
 ```
+cabal init
 cabal build
 cabal run
 ```
+
+## Stack
+
+```
+stack new myproject
+cd myproject
+stack setup
+stack build
+stack run
+```
+
+## Extra
 
 To run an individual main haskell file without creating an executable file:
 

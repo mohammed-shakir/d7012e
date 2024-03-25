@@ -1,11 +1,14 @@
 module Main where
 
-import Test (addIntegers, variableInt)
-import Test2 (variableString)
+import Test
+
+square :: Int -> Int
+square x = x * x
 
 main :: IO ()
 main = do
-  putStrLn "Hello, Haskell!"
-  print variableInt
+  putStrLn "Test 1"
+  putStrLn varStr
+  print varInt
   print (addIntegers 1 2)
-  putStrLn variableString
+  print (square 2)
