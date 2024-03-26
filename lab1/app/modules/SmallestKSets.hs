@@ -5,7 +5,7 @@ tails :: [a] -> [([a], Int)]
 tails xs = zip (tails' xs) [0 ..]
   where
     tails' [] = [[]]
-    tails' (x : xs) = (x : xs) : tails' xs
+    tails' (x : rest) = (x : rest) : tails' rest
 
 -- All contiguous subarrays
 subarrays :: [Int] -> [([Int], Int)]
@@ -13,6 +13,7 @@ subarrays xs = [(take i ys, idx) | (ys, idx) <- tails xs, i <- [1 .. length ys]]
 
 -- Compute sum of each subarray, and save indices of head and tail
 subarrayDetails :: [Int] -> [(Int, Int, Int)]
+subarrayDetails [] = error "Empty list"
 subarrayDetails xs = [(sum ys, idx, idx + length ys - 1) | (ys, idx) <- subarrays xs, not (null ys)]
 
 -- Sort tuples by first element
@@ -28,6 +29,6 @@ sortTuples = foldr insert []
 -- Print the result
 printTuples :: [(Int, Int, Int)] -> [Int] -> IO ()
 printTuples [] _ = return ()
-printTuples ((sum, i, j) : tuples) list = do
-  putStrLn $ "  " ++ show sum ++ "   " ++ show (i + 1) ++ "   " ++ show (j + 1) ++ "   " ++ show (take (j - i + 1) (drop i list))
+printTuples ((sumVal, i, j) : tuples) list = do
+  putStrLn $ show sumVal ++ "    " ++ show (i + 1) ++ "  " ++ show (j + 1) ++ "  " ++ show (take (j - i + 1) (drop i list))
   printTuples tuples list
