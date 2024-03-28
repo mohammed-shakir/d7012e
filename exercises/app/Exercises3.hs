@@ -32,3 +32,41 @@ checkF f n
   | otherwise = f n >= f (n - 1) && f n > 0 && checkF f (n - 1)
 
 -- Exercise 9.9
+iter :: Int -> (Int -> Int) -> Int -> Int
+iter n f x
+  | n == 0 = x
+  | otherwise = iter (n - 1) f (f x)
+
+mySquare :: Int -> Int
+mySquare n = n * n
+
+-- Exercise 9.10
+twoPowerN :: Int -> Int
+twoPowerN n = iter n double 1
+  where
+    double x = 2 * x
+
+-- Exercise 9.11
+sumOfSquares2 :: Int -> Int
+sumOfSquares2 n = foldr1 (+) (map (\x -> x * x) [1 .. n])
+
+-- Exercise 9.16
+helperFunction :: Int -> Bool
+helperFunction n
+  | n <= 10 = True
+  | otherwise = False
+
+filterFirst :: (a -> Bool) -> [a] -> [a]
+filterFirst p (x : xs)
+  | p x == False = xs
+  | otherwise = x : filterFirst p xs
+
+-- Exercise 9.17
+myReverse :: [a] -> [a]
+myReverse [] = []
+myReverse (x : xs) = myReverse xs ++ [x]
+
+filterLast :: (a -> Bool) -> [a] -> [a]
+filterLast p lst = myReverse (filterFirst p (myReverse lst))
+
+-- Exercise 10.3

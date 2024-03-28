@@ -6,5 +6,4 @@ import Exercises3
 
 main :: IO ()
 main = do
-  -- print (unzipFun [(1,2), (3,4)])
-  print $ isSubsequentString "ace" "abcdefg"
+  putStrLn "D7012E"
