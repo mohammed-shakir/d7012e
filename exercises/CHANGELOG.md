@@ -1,4 +1,4 @@
-# Revision history for exercises1
+# Revision history for exercises
 
 ## 0.1.0.0 -- YYYY-mm-dd
 
