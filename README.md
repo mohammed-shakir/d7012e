@@ -33,7 +33,7 @@ To run an individual main haskell file without creating an executable file:
 runhaskell Main.hs
 ```
 
-Use ghci to load a haskell script:
+Use ghci to load haskell modules:
 
 ```
 ghci
