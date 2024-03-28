@@ -59,18 +59,18 @@ intSquareRoot n
       | otherwise = intSquareRoot' n (x + 1)
 
 -- Exercise 4.9
-f :: Int -> Int
-f n
-  | n < 1 = 0
+f2 :: Int -> Int
+f2 n
+  | n < 1 = 1
   | n == 2 = 2
   | n > 10 && n < 20 = 15
-  | n > 30 = 100000
-  | otherwise = 30
+  | n > 30 = 100
+  | otherwise = 300
 
 fMax :: Int -> Int
 fMax n
-  | n == 1 = f 1
-  | otherwise = max (f n) (fMax (n - 1))
+  | n == 1 = f2 1
+  | otherwise = max (f2 n) (fMax (n - 1))
 
 -- Exercise 4.14
 powerOf2 :: Int -> Int
