@@ -70,3 +70,17 @@ filterLast :: (a -> Bool) -> [a] -> [a]
 filterLast p lst = myReverse (filterFirst p (myReverse lst))
 
 -- Exercise 10.3
+composeList :: [a -> a] -> (a -> a)
+composeList = foldr (.) id
+
+-- Exercise 10.7
+myFlip :: (a -> b -> c) -> (b -> a -> c)
+myFlip f x y = f y x
+
+-- Exercise 10.8
+checkChar :: Char -> Bool
+checkChar x = not (elem x [' ', '\t', '\n'])
+
+-- Exercise 10.13
+sec :: [Int] -> [Int]
+sec = map (\x -> x + 1) . filter (\y -> y > -1)
