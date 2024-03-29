@@ -122,7 +122,7 @@ subst oldSub newSub st =
       "" -> ""
       (x : xs) -> x : subst oldSub newSub xs
 
--- Helper function to check if one string is the prefix of another
+-- Helper function
 isPrefixOf :: (Eq a) => [a] -> [a] -> Bool
 isPrefixOf [] _ = True
 isPrefixOf _ [] = False

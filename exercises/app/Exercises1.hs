@@ -38,7 +38,6 @@ largerRoot a b c
   | otherwise = (-b + sqrt (b ^ 2 - 4 * a * c)) / (2 * a)
 
 -- Exercise 4.7
--- usinf the addtion function over natural numbers, give a recursive defination of multiplication of natural numbers
 funNaturalNumbers :: Int -> Int -> Int
 funNaturalNumbers m n
   | n == 0 = 0
