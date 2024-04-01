@@ -13,5 +13,4 @@ main = do
   -- let list = [3, 2, -4, 3, 2, -5, -2, 2, 3, -3, 2, -5, 6, -2, 2, 3]
   -- let k = 8
   let sortedTuples = take k (sortTuples (subarrayDetails list))
-  putStrLn "size   i   j   sublist"
   printTuples sortedTuples list

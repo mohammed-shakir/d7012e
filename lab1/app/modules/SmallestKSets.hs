@@ -28,7 +28,25 @@ sortTuples = foldr insert []
 
 -- Print the result
 printTuples :: [(Int, Int, Int)] -> [Int] -> IO ()
-printTuples [] _ = return ()
-printTuples ((sumVal, i, j) : tuples) list = do
-  putStrLn $ show sumVal ++ "    " ++ show (i + 1) ++ "  " ++ show (j + 1) ++ "  " ++ show (take (j - i + 1) (drop i list))
-  printTuples tuples list
+printTuples tuples list = do
+  putStrLn "size      i      j      sublist"
+  let printEachTuple [] = return ()
+      printEachTuple ((sumVal, i, j) : xs) = do
+        let sumValStr = show sumVal
+        let iStr = show (i + 1)
+        let jStr = show (j + 1)
+        let sublistStr = show (take (j - i + 1) (drop i list))
+
+        let spaces = 6
+        let sizeHeaderLength = 4
+        let iHeaderLength = 1
+        let jHeaderLength = 1
+
+        let sumValPad = replicate (sizeHeaderLength - length sumValStr) ' '
+        let iPad = replicate (iHeaderLength - length iStr + spaces) ' '
+        let jPad = replicate (jHeaderLength - length jStr + spaces) ' '
+        let sublistPad = replicate spaces ' '
+
+        putStrLn $ sumValPad ++ sumValStr ++ iPad ++ iStr ++ jPad ++ jStr ++ sublistPad ++ sublistStr
+        printEachTuple xs
+  printEachTuple tuples
