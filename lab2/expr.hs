@@ -111,7 +111,7 @@ simplify (Op oper left right) =
         (op, le, re) -> Op op le re
 
 -- Task 2
--- mkfun (parse "x*2+3", parse "x")
+-- mkfun (parse "x*2+3", parse "x") 3.0
 mkfun :: (EXPR, EXPR) -> (Float -> Float)
 mkfun (e, e') = \x -> eval e [(unparse e', x)]
 
