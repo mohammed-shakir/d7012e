@@ -113,7 +113,7 @@ simplify (Op oper left right) =
 -- Task 2
 -- mkfun (parse "x*2+3", parse "x") 3.0
 mkfun :: (EXPR, EXPR) -> (Float -> Float)
-mkfun (e, e') = \x -> eval e [(unparse e', x)]
+mkfun (e, Var e') = \x -> eval e [(e', x)]
 
 -- Task 3
 -- findzero "x" "x*2+3" 1
