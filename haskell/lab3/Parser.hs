@@ -20,7 +20,7 @@ module Parser
 where
 
 import CoreParser
-import Data.Char
+import Data.Char (Char, digitToInt, isAlpha, isDigit, isSpace)
 import Prelude hiding (fail, return)
 
 infixl 7 -#, #-
@@ -33,6 +33,7 @@ err message cs = error (message ++ " near " ++ cs ++ "\n")
 iter :: Parser a -> Parser [a]
 iter m = m # iter m >-> cons ! return []
 
+cons :: (a, [a]) -> [a]
 cons (a, b) = a : b
 
 -- Assignment 1
@@ -60,6 +61,7 @@ word = token (letter # iter letter >-> cons)
 
 -- chars
 chars :: Int -> Parser String
+chars 0 = return []
 chars n = char # chars (n - 1) >-> cons
 
 accept :: String -> Parser String

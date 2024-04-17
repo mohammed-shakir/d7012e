@@ -1,7 +1,8 @@
 module Program (T, parse, fromString, toString, exec) where
 
+import CoreParser qualified
 import Dictionary qualified
-import Parser hiding (T)
+import Parser (Parse (..), iter, (>->))
 import Statement qualified
 import Prelude hiding (fail, return)
 
@@ -9,8 +10,11 @@ import Prelude hiding (fail, return)
 newtype T = Program [Statement.T]
 
 instance Parse T where
+  parse :: CoreParser.Parser T
   parse = iter Statement.parse >-> Program
+  toString :: T -> String
   toString (Program stmts) = concatMap Statement.toString stmts
+  fromString :: String -> T
   fromString cs = case parse cs of
     Just (program, []) -> program
     Just (_, remaining) -> error ("Remains: " ++ remaining)

@@ -25,7 +25,21 @@ module Expr (Expr, T, parse, fromString, value, toString) where
 -}
 
 import Dictionary qualified
-import Parser hiding (T)
+import Parser
+  ( Parse (..),
+    Parser,
+    err,
+    lit,
+    number,
+    return,
+    word,
+    (!),
+    (#),
+    (#-),
+    (#>),
+    (-#),
+    (>->),
+  )
 import Prelude hiding (fail, return)
 
 data Expr
@@ -44,18 +58,21 @@ term', expr' :: Expr -> Parser Expr
 var = word >-> Var
 num = number >-> Num
 
+mulOp :: Parser (Expr -> Expr -> Expr)
 mulOp =
   lit '*'
-    >-> (\_ -> Mul)
+    >-> const Mul
     ! lit '/'
-    >-> (\_ -> Div)
+    >-> const Div
 
+addOp :: Parser (Expr -> Expr -> Expr)
 addOp =
   lit '+'
-    >-> (\_ -> Add)
+    >-> const Add
     ! lit '-'
-    >-> (\_ -> Sub)
+    >-> const Sub
 
+bldOp :: t1 -> (t1 -> t2 -> t3, t2) -> t3
 bldOp e (oper, e') = oper e e'
 
 factor =
@@ -74,6 +91,7 @@ expr' e = addOp # term >-> bldOp e #> expr' ! return e
 
 expr = term #> expr'
 
+parens :: Bool -> [Char] -> [Char]
 parens cond str = if cond then "(" ++ str ++ ")" else str
 
 shw :: Int -> Expr -> String
@@ -94,12 +112,12 @@ value (Var v) dict =
 value (Add t u) dict = value t dict + value u dict
 value (Sub t u) dict = value t dict - value u dict
 value (Mul t u) dict = value t dict * value u dict
-value (Div t u) dict =
-  let u2 = value u dict
-   in if u2 == 0
-        then error "No divition by 0"
-        else value t dict `div` u2
+value (Div t u) dict
+  | value u dict == 0 = error "division by 0"
+  | otherwise = value t dict `div` value u dict
 
 instance Parse Expr where
+  parse :: Parser Expr
   parse = expr
+  toString :: Expr -> String
   toString = shw 0

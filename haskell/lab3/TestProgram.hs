@@ -1,9 +1,10 @@
 {- Test for Program -}
 module TestProgram where
 
-import Program
+import Distribution.TestSuite (Test)
+import Program (T, exec, fromString, toString)
 
-p, p1, p3 :: Program.T
+p, p1, p2 :: Program.T
 p =
   fromString
     "\
@@ -36,7 +37,7 @@ p1 =
     \    n :=q;\
     \  end\
     \write s;"
-p3 =
+p2 =
   fromString
     "\
     \count := 0;\
@@ -47,8 +48,14 @@ p3 =
     \until 1;\
     \write count;"
 
+sp :: IO ()
 sp = putStr (toString p)
 
+rp :: [Integer]
 rp = Program.exec p [3, 16]
 
+rp1 :: [Integer]
 rp1 = Program.exec p1 [1024, 2]
+
+rp2 :: [Integer]
+rp2 = Program.exec p2 []
