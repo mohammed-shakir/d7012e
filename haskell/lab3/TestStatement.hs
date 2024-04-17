@@ -24,3 +24,18 @@ p10 = fromString "begin read x ; x := x + 1 ; write x; end" {- Begin [Read "x",A
 p11 = fromString ("begin read n; fac:=1; " ++ s9 ++ " write fac; end" {- Begin [Read "n",Assignment "fac" (Num 1),While (Var "n") (Begin [Assignment "fac" (Mul (Var "fac") (Var "n")),Assignment "n" (Sub (Var "n") (Num 1))]),Write (Var "fac")] -})
 
 p12 = fromString "repeat x:=x+1; until x;" {- Repeat (Assignment "x" (Add (Var "x") (Num 1))) (Var "x") -}
+
+runTests :: IO ()
+runTests = do
+  print p1
+  print p2
+  print p3
+  print p4
+  print p5
+  print p6
+  print p7
+  print p8
+  print p9
+  print p10
+  print p11
+  print p12

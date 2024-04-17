@@ -59,3 +59,10 @@ rp1 = Program.exec p1 [1024, 2]
 
 rp2 :: [Integer]
 rp2 = Program.exec p2 []
+
+runTests :: IO ()
+runTests = do
+  sp
+  print rp
+  print rp1
+  print rp2

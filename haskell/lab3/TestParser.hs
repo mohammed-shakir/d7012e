@@ -44,3 +44,18 @@ r2 = require "else" "then" {- Program error: expecting else near then -}
 
 a4 :: Maybe (String, String)
 a4 = (accept "read" -# word) "read count" {-  Just ("count","") -}
+
+-- create a function that runs all these test cases so i can run it in ghci
+runTests :: IO ()
+runTests = do
+  print l1
+  print l2
+  print l3
+  print w1
+  print w2
+  print c1
+  print c2
+  print c3
+  print r1
+  print r2
+  print a4

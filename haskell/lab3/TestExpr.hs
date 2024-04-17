@@ -29,3 +29,12 @@ n21 = testValue "1/(2-y)" {-  Expr.value: division by 0 -}
 
 n31 :: Integer
 n31 = testValue "2+z" {-  Expr.value: undefined variable z -}
+
+runTests :: IO ()
+runTests = do
+  print n1
+  print n2
+  print n3
+  print n4
+  print n21
+  print n31
