@@ -84,6 +84,7 @@ shw prec (Sub t u) = parens (prec > 5) (shw 5 t ++ "-" ++ shw 6 u)
 shw prec (Mul t u) = parens (prec > 6) (shw 6 t ++ "*" ++ shw 6 u)
 shw prec (Div t u) = parens (prec > 6) (shw 6 t ++ "/" ++ shw 7 u)
 
+-- Assignment 2
 value :: Expr -> Dictionary.T String Integer -> Integer
 value (Num n) _ = n
 value (Var v) dict =
@@ -93,7 +94,11 @@ value (Var v) dict =
 value (Add t u) dict = value t dict + value u dict
 value (Sub t u) dict = value t dict - value u dict
 value (Mul t u) dict = value t dict * value u dict
-value (Div t u) dict = value t dict `div` value u dict
+value (Div t u) dict =
+  let u2 = value u dict
+   in if u2 == 0
+        then error "No divition by 0"
+        else value t dict `div` u2
 
 instance Parse Expr where
   parse = expr

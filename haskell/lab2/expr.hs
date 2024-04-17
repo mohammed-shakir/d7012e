@@ -1,3 +1,5 @@
+module Expr where
+
 import Data.Char
 
 -- Task 1
