@@ -133,14 +133,22 @@ instance Parse Statement where
 
 -- Assignment 5
 statementToString :: Statement -> String
+-- Assignment
 statementToString (Assignment var expr) = var ++ " := " ++ Expr.toString expr ++ ";\n"
+-- If
 statementToString (If cond thenStmts elseStmts) =
   "if " ++ Expr.toString cond ++ " then\n" ++ toString thenStmts ++ "else\n" ++ toString elseStmts
+-- Skip
 statementToString Skip = "skip;\n"
+-- Begin
 statementToString (Begin stmts) = "begin\n" ++ concatMap toString stmts ++ "end\n"
+-- While
 statementToString (While cond stmt) =
   "while " ++ Expr.toString cond ++ " do\n" ++ toString stmt ++ "\n"
+-- Read
 statementToString (Read var) = "read " ++ var ++ ";\n"
+-- Write
 statementToString (Write expr) = "write " ++ Expr.toString expr ++ ";\n"
+-- Repeat
 statementToString (Repeat stmt cond) =
   "repeat\n" ++ toString stmt ++ "until " ++ Expr.toString cond ++ ";\n"
