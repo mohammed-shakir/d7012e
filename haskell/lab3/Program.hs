@@ -14,11 +14,6 @@ instance Parse T where
   parse = iter Statement.parse >-> Program
   toString :: T -> String
   toString (Program stmts) = concatMap Statement.toString stmts
-  fromString :: String -> T
-  fromString cs = case parse cs of
-    Just (program, []) -> program
-    Just (_, remaining) -> error ("Remains: " ++ remaining)
-    Nothing -> error "Nothing"
 
 exec :: T -> [Integer] -> [Integer]
 exec (Program stmts) = Statement.exec stmts Dictionary.empty
