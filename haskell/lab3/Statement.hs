@@ -20,6 +20,7 @@ import Prelude hiding (fail, return)
 type T = Statement
 
 -- Assignment 3
+-- Assignment 3.a
 data Statement
   = Assignment String Expr.T
   | If Expr.T Statement Statement
@@ -31,6 +32,7 @@ data Statement
   | Repeat Statement Expr.T
   deriving (Show)
 
+-- Assignment 3.b
 -- Assignment
 assignment :: Parser Statement
 assignment = word #- accept ":=" # Expr.parse #- require ";" >-> buildAss
@@ -87,6 +89,8 @@ repeatStmt = accept "repeat" -# parse # require "until" -# Expr.parse #- require
 buildRepeat :: (Statement, Expr.T) -> Statement
 buildRepeat (s, e) = Repeat s e
 
+-- Assignment 3.d
+-- Takes list of statements, dictionary and list of integers as input
 exec :: [T] -> Dictionary.T String Integer -> [Integer] -> [Integer]
 exec [] _ _ = []
 exec (If cond thenStmts elseStmts : stmts) dict input =
@@ -117,6 +121,7 @@ exec (Write expr : stmts) dict input =
 exec (Repeat stmt cond : stmts) dict input =
   exec (stmt : If cond Skip (Repeat stmt cond) : stmts) dict input
 
+-- Assignment 3.c
 instance Parse Statement where
   parse :: Parser Statement
   parse =

@@ -37,29 +37,36 @@ class Parse a where
       Nothing -> error "Nothing"
   toString :: a -> String
 
+-- Function that takes a String and returns a Maybe (a, String)
 type Parser a = String -> Maybe (a, String)
 
+-- Parses the first character of a string
 char :: Parser Char
 char [] = Nothing
 char (c : cs) = Just (c, cs)
 
+-- Returns a parser that always returns the value a
 return :: a -> Parser a
 return a cs = Just (a, cs)
 
+-- Returns a parser that always fails
 fail :: Parser a
 fail cs = Nothing
 
+-- Tries the first parser m, and if it fails, tries the second parser n
 (!) :: Parser a -> Parser a -> Parser a
 (m ! n) cs = case m cs of
   Nothing -> n cs
   mcs -> mcs
 
+-- It applies a condition p to the result of parser m
 (?) :: Parser a -> (a -> Bool) -> Parser a
 (m ? p) cs =
   case m cs of
     Nothing -> Nothing
     Just (r, s) -> if p r then Just (r, s) else Nothing
 
+-- It runs two parsers in sequence
 (#) :: Parser a -> Parser b -> Parser (a, b)
 (m # n) cs =
   case m cs of
@@ -69,12 +76,14 @@ fail cs = Nothing
         Nothing -> Nothing
         Just (b, cs'') -> Just ((a, b), cs'')
 
+-- Transforms the result of parser m using a function b
 (>->) :: Parser a -> (a -> b) -> Parser b
 (m >-> b) cs =
   case m cs of
     Just (a, cs') -> Just (b a, cs')
     Nothing -> Nothing
 
+-- It applies a function k to the result of parser p
 (#>) :: Parser a -> (a -> Parser b) -> Parser b
 (p #> k) cs =
   case p cs of
