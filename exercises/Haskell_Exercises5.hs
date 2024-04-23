@@ -1,4 +1,4 @@
-module Exercises5 where
+module Haskell_Exercises5 where
 
 -- Exercise 14.1
 data Temp = Cold | Hot deriving (Show)

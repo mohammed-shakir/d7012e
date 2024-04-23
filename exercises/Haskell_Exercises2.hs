@@ -1,4 +1,4 @@
-module Exercises2 where
+module Haskell_Exercises2 where
 
 -- Exrecise 5.2
 orderTriple :: (Int, Int, Int) -> (Int, Int, Int)

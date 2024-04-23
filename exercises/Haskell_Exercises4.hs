@@ -1,4 +1,4 @@
-module Exercises4 where
+module Haskell_Exercises4 where
 
 -- Exercise 12.2
 numEqual :: Int -> [Int] -> Int

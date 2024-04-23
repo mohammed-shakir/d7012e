@@ -1,4 +1,4 @@
-module Exercises1 where
+module Haskell_Exercises1 where
 
 -- Exercise 3.7
 threeDifferent :: Int -> Int -> Int -> Bool

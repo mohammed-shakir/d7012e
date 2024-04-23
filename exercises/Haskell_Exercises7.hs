@@ -1,4 +1,4 @@
-module Exercises7 where
+module Haskell_Exercises7 where
 
 -- Exercise 18.1
 getNput :: IO ()

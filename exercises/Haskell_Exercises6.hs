@@ -1,4 +1,4 @@
-module Exercises6 where
+module Haskell_Exercises6 where
 
 -- Exercise 16.9
 class Deque d where
@@ -33,5 +33,5 @@ subSequences [] = [[]]
 subSequences (x : xs) = subSequences xs ++ map (x :) (subSequences xs)
 
 -- Exercise 17.4
-scalarProduct :: Num a => [a] -> [a] -> a
+scalarProduct :: (Num a) => [a] -> [a] -> a
 scalarProduct xs ys = sum (zipWith (*) xs ys)

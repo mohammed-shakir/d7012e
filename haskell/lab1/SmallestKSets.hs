@@ -53,13 +53,23 @@ printTuples tuples list = do
 
 main :: IO ()
 main = do
-  let list = [-1, 2, -3, 4, -5]
-  let k = 3
-  -- let list = [x * (-1) ^ x | x <- [1 .. 100]]
-  -- let k = 15
-  -- let list = [24, -11, -34, 42, -24, 7, -19, 21]
-  -- let k = 6
-  -- let list = [3, 2, -4, 3, 2, -5, -2, 2, 3, -3, 2, -5, 6, -2, 2, 3]
-  -- let k = 8
-  let sortedTuples = take k (sortTuples (subarrayDetails list))
-  printTuples sortedTuples list
+  let list1 = [-1, 2, -3, 4, -5]
+  let k1 = 3
+  let list2 = [x * (-1) ^ x | x <- [1 .. 100]]
+  let k2 = 15
+  let list3 = [24, -11, -34, 42, -24, 7, -19, 21]
+  let k3 = 6
+  let list4 = [3, 2, -4, 3, 2, -5, -2, 2, 3, -3, 2, -5, 6, -2, 2, 3]
+  let k4 = 8
+  let sortedTuples = take k1 (sortTuples (subarrayDetails list1))
+  printTuples sortedTuples list1
+  putStrLn ""
+  let sortedTuples = take k2 (sortTuples (subarrayDetails list2))
+  printTuples sortedTuples list2
+  putStrLn ""
+  let sortedTuples = take k3 (sortTuples (subarrayDetails list3))
+  printTuples sortedTuples list3
+  putStrLn ""
+  let sortedTuples = take k4 (sortTuples (subarrayDetails list4))
+  printTuples sortedTuples list4
+  putStrLn ""

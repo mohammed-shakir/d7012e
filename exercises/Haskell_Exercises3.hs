@@ -1,4 +1,4 @@
-module Exercises3 where
+module Haskell_Exercises3 where
 
 -- Exercise 9.2
 myLength :: [a] -> Int
