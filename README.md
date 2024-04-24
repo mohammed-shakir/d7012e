@@ -7,7 +7,7 @@ sudo apt update
 curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | sh
 ```
 
-## Cabal
+### Cabal
 
 ```
 cabal init
@@ -15,7 +15,7 @@ cabal build
 cabal run
 ```
 
-## Stack
+### Stack
 
 ```
 stack new myproject
@@ -25,7 +25,7 @@ stack build
 stack run
 ```
 
-## Extra
+### Run Haskell
 
 To run an individual main haskell file without creating an executable file:
 
@@ -47,7 +47,7 @@ sudo apt update
 sudo apt install swi-prolog
 ```
 
-## Run prolog
+### Run prolog
 
 ```
 swipl
