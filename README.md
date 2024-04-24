@@ -39,3 +39,17 @@ Use ghci to load haskell modules:
 ghci
 :l yourFile.hs
 ```
+
+## Install prolog
+
+```
+sudo apt update
+sudo apt install swi-prolog
+```
+
+## Run prolog
+
+```
+swipl
+[file_name].
+```
