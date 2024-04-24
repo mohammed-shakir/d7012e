@@ -6,7 +6,7 @@ import Parser (Parse (..), iter, (>->))
 import Statement qualified
 import Prelude hiding (fail, return)
 
--- Assignment 4 and 5
+-- Assignment 4
 newtype T = Program [Statement.T]
 
 instance Parse T where
