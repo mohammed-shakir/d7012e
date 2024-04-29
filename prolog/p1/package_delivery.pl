@@ -112,7 +112,7 @@ solveR_helper(State, _, _, []) :-
 % State: current state, N: maximum number of moves, Visited: list of visited states, Trace: list of moves
 solveR_helper(State, N, Visited, [Move | Trace]) :-
     N > 0,
-    move(State, Move, NewState), % Attempts a move from the current State resulting in NewState. Move is the action taken that led to NewState.
+    move(State, Move, NewState), % Attempts a move from the current State resulting in NewState.
     \+ member(NewState, Visited), % \+ is the negation operator. Checks so that NewState is not in the list of visited states to prevent cycles.
     N1 is N - 1,
     solveR_helper(NewState, N1, [NewState | Visited], Trace).
