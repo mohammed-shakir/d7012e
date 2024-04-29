@@ -106,8 +106,7 @@ solveR(State, N, Trace) :-
     solveR_helper(State, N, [State], Trace).
 
 solveR_helper(State, _, _, []) :-
-    goal(State),
-    !. % Prevent backtracking once the goal state is found
+    goal(State). % Prevent backtracking once the goal state is found
 
 % State: current state, N: maximum number of moves, Visited: list of visited states, Trace: list of moves
 solveR_helper(State, N, Visited, [Move | Trace]) :-
@@ -117,6 +116,6 @@ solveR_helper(State, N, Visited, [Move | Trace]) :-
     N1 is N - 1,
     solveR_helper(NewState, N1, [NewState | Visited], Trace).
 
-% solveR(state(r1, [], [steel_key], [brass_key], [package]), 10, Trace).
+% solveR(state(r1, [], [steel_key], [brass_key], [package]), 12, Trace).
 
 % set_prolog_flag(answer_write_options, [max_depth(0)])
