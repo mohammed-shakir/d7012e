@@ -73,6 +73,36 @@ initBoard([	[.,.,.,.,.,.],
             [.,.,.,.,.,.], 
 	    	[.,.,.,.,.,.] ]).
 
+% A board where player 1 has fewer stones than player 2
+testBoard1([
+    [2, 2, 2, 2, 2, 2],
+    [2, 1, 1, 1, 1, 2],
+    [2, 1, ., ., 1, 2],
+    [2, 1, ., ., 1, 2],
+    [2, 1, 1, 1, 1, 2],
+    [2, 2, 2, 2, 2, 2]
+]).
+
+% A board where player 2 has fewer stones than player 1
+testBoard2([
+    [1, 1, 1, 1, 1, 1],
+    [1, 2, 2, 2, 2, 1],
+    [1, 2, ., ., 2, 1],
+    [1, 2, ., ., 2, 1],
+    [1, 2, 2, 2, 2, 1],
+    [1, 1, 1, 1, 1, 1]
+]).
+
+% Tie / Terminal
+testBoard3([
+    [1, 2, 1, 2, 1, 2],
+    [2, 1, 2, 1, 2, 1],
+    [1, 2, 1, 2, 1, 2],
+    [2, 1, 2, 1, 2, 1],
+    [1, 2, 1, 2, 1, 2],
+    [2, 1, 2, 1, 2, 1]
+]).
+
 % DO NOT CHANGE THIS BLOCK OF COMMENTS.
 %
 %%%%%%%%%%%%%%%%%% IMPLEMENT: initialize(...)%%%%%%%%%%%%%%%%%%%%%
@@ -82,7 +112,6 @@ initBoard([	[.,.,.,.,.,.],
 
 initialize(InitialState,InitialPlyr) :- initBoard(InitialState), InitialPlyr = 1.
 
-
 % DO NOT CHANGE THIS BLOCK OF COMMENTS.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%winner(...)%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -91,9 +120,30 @@ initialize(InitialState,InitialPlyr) :- initBoard(InitialState), InitialPlyr = 1
 %     - returns winning player if State is a terminal position and
 %     Plyr has a higher score than the other player 
 
+% Helper to count stones
+count_stones([], _, 0).
+count_stones([Row|Rest], Player, Count) :-
+    count_stones(Rest, Player, RestCount),
+    count_row(Row, Player, RowCount),
+    Count is RestCount + RowCount.
 
+count_row([], _, 0).
+% If we find the player, we increment the count.
+count_row([P|T], P, Count) :-
+    !, % Once we find the player, we can stop.
+    count_row(T, P, NewCount),
+    Count is NewCount + 1.
+% If we don't find the player, we continue.
+count_row([_|T], P, Count) :- 
+    count_row(T, P, Count).
 
-
+winner(State, Plyr) :-
+    count_stones(State, 1, Count1),
+    count_stones(State, 2, Count2),
+    (
+        (Count1 < Count2 -> Plyr = 1);
+        (Count2 < Count1 -> Plyr = 2)
+    ).
 
 % DO NOT CHANGE THIS BLOCK OF COMMENTS.
 %
@@ -102,9 +152,10 @@ initialize(InitialState,InitialPlyr) :- initBoard(InitialState), InitialPlyr = 1
 %% define tie(State) here. 
 %    - true if terminal State is a "tie" (no winner) 
 
-
-
-
+tie(State) :-
+    count_stones(State, 1, Count1),
+    count_stones(State, 2, Count2),
+    Count1 == Count2.
 
 % DO NOT CHANGE THIS BLOCK OF COMMENTS.
 %
@@ -113,9 +164,11 @@ initialize(InitialState,InitialPlyr) :- initBoard(InitialState), InitialPlyr = 1
 %% define terminal(State). 
 %   - true if State is a terminal   
 
-
-
-
+terminal(State) :-
+    moves(1, State, Moves1),
+    moves(2, State, Moves2),
+    Moves1 == [],
+    Moves2 == [].
 
 % DO NOT CHANGE THIS BLOCK OF COMMENTS.
 %
@@ -146,9 +199,12 @@ printList([H | L]) :-
 %   - returns list MvList of all legal moves Plyr can make in State
 %
 
-
-
-
+moves(Plyr, State, MvList) :-
+    findall(
+		[X,Y],
+		(between(0, 5, X), between(0, 5, Y), validmove(Plyr, State, [X,Y])),
+		MvList
+	).
 
 % DO NOT CHANGE THIS BLOCK OF COMMENTS.
 %
@@ -161,8 +217,6 @@ printList([H | L]) :-
 
 
 
-
-
 % DO NOT CHANGE THIS BLOCK OF COMMENTS.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%validmove(Plyr,State,Proposed)%%%%%%%%%%%%%%%%%%%%
@@ -170,8 +224,27 @@ printList([H | L]) :-
 %% define validmove(Plyr,State,Proposed). 
 %   - true if Proposed move by Plyr is valid at State.
 
+validmove(Plyr, State, [X,Y]) :-
+    get(State, [X,Y], '.'), % Ensure the cell is empty.
+    member(Dx, [-1,0,1]), % Direction deltas for X
+    member(Dy, [-1,0,1]), % Direction deltas for Y
+    (Dx \= 0; Dy \= 0), % Avoid checking the zero direction (no movement)
+    can_flip(Plyr, State, [X,Y], [Dx,Dy], false).
 
+% Helper to find at least one flanking line.
+can_flip(Plyr, State, [X,Y], [Dx,Dy], Found) :-
+    NewX is X + Dx, % New X position
+    NewY is Y + Dy, % New Y position
+	NewX >= 0, NewX < 6, % Check bounds
+	NewY >= 0, NewY < 6, % Check bounds
+    get(State, [NewX,NewY], Cell),
+    players(Plyr, Opponent),
+    (Found -> Cell = Plyr ; Cell = Opponent),
+    (Cell = Plyr ; can_flip(Plyr, State, [NewX,NewY], [Dx,Dy], true)).
 
+% Define the other player.
+players(1, 2).
+players(2, 1).
 
 
 % DO NOT CHANGE THIS BLOCK OF COMMENTS.
