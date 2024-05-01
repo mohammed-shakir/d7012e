@@ -123,6 +123,14 @@ testBoard5([
     [1, 2, 1, 2, 1, 2]
 ]).
 
+testBoard6([[1, 1, 2, ., ., .], 
+        	[2, 1, 1, 2, 1, .],
+	    	[2, 2, 2, 2, 2, .], 
+	    	[2, 1, 1, 1, ., .], 
+            [., 1, 1, ., ., .], 
+	    	[1, ., ., ., ., .] ]).
+
+
 % DO NOT CHANGE THIS BLOCK OF COMMENTS.
 %
 %%%%%%%%%%%%%%%%%% IMPLEMENT: initialize(...)%%%%%%%%%%%%%%%%%%%%%
@@ -225,7 +233,7 @@ moves(Plyr, State, MvList) :-
     findall(
 		[X,Y],
 		(between(0, 5, X), between(0, 5, Y), validmove(Plyr, State, [X,Y])),
-		MvList
+		MvList2
 	).
 
 % DO NOT CHANGE THIS BLOCK OF COMMENTS.
@@ -237,68 +245,88 @@ moves(Plyr, State, MvList) :-
 %     state) and NextPlayer (i.e. the next player who will move).
 %
 
-nextState(Plyr, [X,Y], State, NewState, NextPlyr) :-
-    set(State, StateAfterMove, [X,Y], Plyr), % Set the new stone
-    flip_all_directions(Plyr, [X,Y], StateAfterMove, NewState), % Flip opponent stones
-    other_player(Plyr, NextPlyr). % Switch player
+% Handles actual moves
+nextState(Player, [X, Y], State, NewState, NextPlayer) :-
+    Player \= n, % Ensures it's not a pass move
+    oppositePlayer(Player, NextPlayer), % Gets the opponent
+    set(State, InterimState, [X, Y], Player), % Places the player's stone
+    flipStones([X, Y], Player, InterimState, NewState). % Flips the opponent's stones
 
-other_player(1, 2).
-other_player(2, 1).
+% Handles pass moves
+nextState(Player, n, State, State, NextPlayer) :-
+    oppositePlayer(Player, NextPlayer).
 
-directions([
-    [0, 1],     % Right
-    [1, 1],     % Down-right
-    [1, 0],     % Down
-    [1, -1],    % Down-left
-    [0, -1],    % Left
-    [-1, -1],   % Up-left
-    [-1, 0],    % Up
-    [-1, 1]     % Up-right
-]).
+oppositePlayer(1, 2).
+oppositePlayer(2, 1).
 
-in_bounds(X, Y) :-
-    X >= 0, X < 6, Y >= 0, Y < 6.
+% Flip stones in all directions
+flipStones([X, Y], Player, State, NewState) :-
+    Directions = [[1,0], [-1,0], [0,1], [0,-1], [1,1], [1,-1], [-1,1], [-1,-1]],
+    foldl(flipDirection(Player, [X, Y]), Directions, State, NewState).
 
-% Flip all directions
-flip_all_directions(Plyr, Pos, State, NewState) :-
-    directions(Dirs),
-    flip_directions(Plyr, Pos, Dirs, State, NewState).
+% Helper to flip stones in a specific direction
+flipDirection(Player, [X, Y], [DX, DY], State, NewState) :-
+    NX is X + DX, NY is Y + DY,
+    canFlip(Player, State, [NX, NY], [DX, DY]), !,
+    doFlip(Player, [NX, NY], [DX, DY], State, NewState).
+flipDirection(_, _, _, State, State).
 
-% Recursive flipping in all directions
-flip_directions(_, _, [], State, State).
-flip_directions(Plyr, Pos, [Dir|Dirs], State, NewState) :-
-    flip_in_direction(Plyr, Pos, Dir, State, StateAfterFlip),
-    flip_directions(Plyr, Pos, Dirs, StateAfterFlip, NewState).
-
-% Flip in a specific direction
-flip_in_direction(Plyr, [X, Y], [DX, DY], State, NewState) :-
-    step([X, Y], [DX, DY], NextPos),
-    try_flip(Plyr, NextPos, [DX, DY], State, NewState).
-
-% Calculate next position
-step([X, Y], [DX, DY], [NX, NY]) :-
-    NX is X + DX,
-    NY is Y + DY.
-
-% Attempt to flip stones starting from a position in a given direction
-try_flip(Plyr, [X, Y], [DX, DY], State, NewState) :-
+% Check if flipping is possible in this direction
+canFlip(Player, State, [X, Y], [DX, DY]) :-
     in_bounds(X, Y),
+    oppositePlayer(Player, Opponent),
     get(State, [X, Y], Opponent),
-    other_player(Plyr, Opponent),  % Ensuring the next stone is opponent's
-    continue_flipping(Plyr, [X, Y], [DX, DY], State, NewState).
+    NX is X + DX, NY is Y + DY,
+    tilesToFlip(Player, State, [NX, NY], [DX, DY]).
 
-% Continue flipping until a player's stone is found
-continue_flipping(Plyr, [X, Y], [DX, DY], State, NewState) :-
-    step([X, Y], [DX, DY], NextPos),
-    get(State, NextPos, Val),
-    Val == Plyr,  % Stop if we reach a player's stone
-    set(State, NewState, [X, Y], Plyr).
-continue_flipping(Plyr, [X, Y], [DX, DY], State, NewState) :-
-    step([X, Y], [DX, DY], NextPos),
-    get(State, NextPos, Opponent),
-    other_player(Plyr, Opponent),
-    continue_flipping(Plyr, NextPos, [DX, DY], State, TempState),
-    set(TempState, NewState, [X, Y], Plyr).
+% Recursively check if a tile can be flipped (end with a player's tile)
+tilesToFlip(Player, State, [X, Y], [DX, DY]) :-
+    in_bounds(X, Y),
+    get(State, [X, Y], Tile),
+    (Tile == Player; (Tile \= '.', NX is X + DX, NY is Y + DY, tilesToFlip(Player, State, [NX, NY], [DX, DY]))).
+
+% Flip tiles along the direction
+doFlip(Player, [X, Y], [DX, DY], State, NewState) :-
+    in_bounds(X, Y),
+    get(State, [X, Y], Tile),
+    oppositePlayer(Player, Tile),
+    set(State, InterState, [X, Y], Player),
+    NX is X + DX, NY is Y + DY,
+    doFlip(Player, [NX, NY], [DX, DY], InterState, NewState).
+doFlip(_, [X, Y], [DX, DY], State, NewState) :-
+    in_bounds(X, Y),
+    get(State, [X, Y], Player),
+    NX is X + DX, NY is Y + DY,
+    propagateFlip(Player, [NX, NY], [DX, DY], State, NewState).
+doFlip(_, _, _, State, State).
+
+% Continue flipping in the same direction if in bounds and the tile is an opponent's tile
+propagateFlip(Player, [X, Y], [DX, DY], State, NewState) :-
+    in_bounds(X, Y),
+    get(State, [X, Y], Tile),
+    oppositePlayer(Player, Tile),
+    set(State, InterState, [X, Y], Player),
+    NX is X + DX, NY is Y + DY,
+    propagateFlip(Player, [NX, NY], [DX, DY], InterState, NewState).
+propagateFlip(_, [X, Y], [DX, DY], State, NewState) :-
+    in_bounds(X, Y),
+    get(State, [X, Y], Player),
+    NX is X + DX, NY is Y + DY,
+    doFlip(Player, [NX, NY], [DX, DY], State, NewState).
+
+% Bound check
+in_bounds(X, Y) :-
+    X >= 0, X < 6,
+    Y >= 0, Y < 6.
+
+% test_moves :-
+%     initialize(State, Player),
+%     nextState(Player, [3,3], State, State1, Player1),
+%     print('After move [1,3]:'), nl,
+%     showState(State1),
+%     nextState(Player1, [1,2], State1, State2, Player2),
+%     print('After move [1,2]:'), nl,
+%     showState(State2).
 
 % DO NOT CHANGE THIS BLOCK OF COMMENTS.
 %
@@ -328,7 +356,6 @@ can_flip(Plyr, State, [X,Y], [Dx,Dy], Found) :-
 % Define the other player.
 players(1, 2).
 players(2, 1).
-
 
 % DO NOT CHANGE THIS BLOCK OF COMMENTS.
 %
@@ -475,4 +502,5 @@ setInList( [Element|RestList], [Element|NewRestList], Index, Value) :-
 	Index > 0, 
 	Index1 is Index-1, 
 	setInList( RestList, NewRestList, Index1, Value). 
- 
+
+% set_prolog_flag(answer_write_options, [max_depth(0)])
