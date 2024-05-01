@@ -103,6 +103,26 @@ testBoard3([
     [2, 1, 2, 1, 2, 1]
 ]).
 
+% Terminal state but player 1 wins
+testBoard4([
+    [2, 2, 1, 2, 1, 2],
+    [2, 1, 2, 1, 2, 1],
+    [1, 2, 1, 2, 1, 2],
+    [2, 1, 2, 1, 2, 1],
+    [1, 2, 1, 2, 1, 2],
+    [2, 1, 2, 1, 2, 1]
+]).
+
+% Terminal state but player 2 wins
+testBoard5([
+    [1, 1, 2, 1, 2, 1],
+    [1, 2, 1, 2, 1, 2],
+    [2, 1, 2, 1, 2, 1],
+    [1, 2, 1, 2, 1, 2],
+    [2, 1, 2, 1, 2, 1],
+    [1, 2, 1, 2, 1, 2]
+]).
+
 % DO NOT CHANGE THIS BLOCK OF COMMENTS.
 %
 %%%%%%%%%%%%%%%%%% IMPLEMENT: initialize(...)%%%%%%%%%%%%%%%%%%%%%
@@ -138,6 +158,7 @@ count_row([_|T], P, Count) :-
     count_row(T, P, Count).
 
 winner(State, Plyr) :-
+    terminal(State),
     count_stones(State, 1, Count1),
     count_stones(State, 2, Count2),
     (
@@ -153,6 +174,7 @@ winner(State, Plyr) :-
 %    - true if terminal State is a "tie" (no winner) 
 
 tie(State) :-
+    terminal(State),
     count_stones(State, 1, Count1),
     count_stones(State, 2, Count2),
     Count1 == Count2.
@@ -215,7 +237,68 @@ moves(Plyr, State, MvList) :-
 %     state) and NextPlayer (i.e. the next player who will move).
 %
 
+nextState(Plyr, [X,Y], State, NewState, NextPlyr) :-
+    set(State, StateAfterMove, [X,Y], Plyr), % Set the new stone
+    flip_all_directions(Plyr, [X,Y], StateAfterMove, NewState), % Flip opponent stones
+    other_player(Plyr, NextPlyr). % Switch player
 
+other_player(1, 2).
+other_player(2, 1).
+
+directions([
+    [0, 1],     % Right
+    [1, 1],     % Down-right
+    [1, 0],     % Down
+    [1, -1],    % Down-left
+    [0, -1],    % Left
+    [-1, -1],   % Up-left
+    [-1, 0],    % Up
+    [-1, 1]     % Up-right
+]).
+
+in_bounds(X, Y) :-
+    X >= 0, X < 6, Y >= 0, Y < 6.
+
+% Flip all directions
+flip_all_directions(Plyr, Pos, State, NewState) :-
+    directions(Dirs),
+    flip_directions(Plyr, Pos, Dirs, State, NewState).
+
+% Recursive flipping in all directions
+flip_directions(_, _, [], State, State).
+flip_directions(Plyr, Pos, [Dir|Dirs], State, NewState) :-
+    flip_in_direction(Plyr, Pos, Dir, State, StateAfterFlip),
+    flip_directions(Plyr, Pos, Dirs, StateAfterFlip, NewState).
+
+% Flip in a specific direction
+flip_in_direction(Plyr, [X, Y], [DX, DY], State, NewState) :-
+    step([X, Y], [DX, DY], NextPos),
+    try_flip(Plyr, NextPos, [DX, DY], State, NewState).
+
+% Calculate next position
+step([X, Y], [DX, DY], [NX, NY]) :-
+    NX is X + DX,
+    NY is Y + DY.
+
+% Attempt to flip stones starting from a position in a given direction
+try_flip(Plyr, [X, Y], [DX, DY], State, NewState) :-
+    in_bounds(X, Y),
+    get(State, [X, Y], Opponent),
+    other_player(Plyr, Opponent),  % Ensuring the next stone is opponent's
+    continue_flipping(Plyr, [X, Y], [DX, DY], State, NewState).
+
+% Continue flipping until a player's stone is found
+continue_flipping(Plyr, [X, Y], [DX, DY], State, NewState) :-
+    step([X, Y], [DX, DY], NextPos),
+    get(State, NextPos, Val),
+    Val == Plyr,  % Stop if we reach a player's stone
+    set(State, NewState, [X, Y], Plyr).
+continue_flipping(Plyr, [X, Y], [DX, DY], State, NewState) :-
+    step([X, Y], [DX, DY], NextPos),
+    get(State, NextPos, Opponent),
+    other_player(Plyr, Opponent),
+    continue_flipping(Plyr, NextPos, [DX, DY], State, TempState),
+    set(TempState, NewState, [X, Y], Plyr).
 
 % DO NOT CHANGE THIS BLOCK OF COMMENTS.
 %
@@ -259,9 +342,20 @@ players(2, 1).
 %          the value of state (see handout on ideas about
 %          good heuristics.
 
+% Heuristic function h(State, Val)
+h(State, Val) :-
+    terminal(State), !,
+    (
+        winner(State, 1) -> Val = 100  ; % Player 1 wins
+        winner(State, 2) -> Val = -100 ; % Player 2 wins
+        tie(State) -> Val = 0          ; % Tie
+        true -> Val = 0                  % Default case if no terminal state checks triggered
+    ).
 
-
-
+h(State, Val) :-
+    count_stones(State, 1, Count1),
+    count_stones(State, 2, Count2),
+    Val is Count2 - Count1.  % Favor states with fewer stones for Player 1
 
 % DO NOT CHANGE THIS BLOCK OF COMMENTS.
 %
@@ -271,9 +365,7 @@ players(2, 1).
 %   - returns a value B that is less than the actual or heuristic value
 %     of all states.
 
-
-
-
+lowerBound(-100).
 
 % DO NOT CHANGE THIS BLOCK OF COMMENTS.
 %
@@ -283,9 +375,7 @@ players(2, 1).
 %   - returns a value B that is greater than the actual or heuristic value
 %     of all states.
 
-
-
-
+upperBound(100).
 
 % DO NOT CHANGE THIS BLOCK OF COMMENTS.
 %
