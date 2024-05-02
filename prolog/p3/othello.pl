@@ -8,11 +8,8 @@
 %
 /* ------------------------------------------------------- */
 
-
-
 %do not chagne the follwoing line!
 :- ensure_loaded('play.pl').
-
 
 % DO NOT CHANGE THIS BLOCK OF COMMENTS.
 %
@@ -41,12 +38,6 @@
 %          * upperBound(B)
 % /* ------------------------------------------------------ */
 
-
-
-
-
-
-
 % /* ------------------------------------------------------ */
 
 % DO NOT CHANGE THIS BLOCK OF COMMENTS.
@@ -57,10 +48,6 @@
 %    . means the position is  empty
 %    1 means player one has a stone in this position
 %    2 means player two has a stone in this position. 
-
-
-
-
 
 % DO NOT CHANGE THE COMMENT BELOW.
 %
@@ -73,28 +60,8 @@ initBoard([	[.,.,.,.,.,.],
             [.,.,.,.,.,.], 
 	    	[.,.,.,.,.,.] ]).
 
-% A board where player 1 has fewer stones than player 2
+% Tie
 testBoard1([
-    [2, 2, 2, 2, 2, 2],
-    [2, 1, 1, 1, 1, 2],
-    [2, 1, ., ., 1, 2],
-    [2, 1, ., ., 1, 2],
-    [2, 1, 1, 1, 1, 2],
-    [2, 2, 2, 2, 2, 2]
-]).
-
-% A board where player 2 has fewer stones than player 1
-testBoard2([
-    [1, 1, 1, 1, 1, 1],
-    [1, 2, 2, 2, 2, 1],
-    [1, 2, ., ., 2, 1],
-    [1, 2, ., ., 2, 1],
-    [1, 2, 2, 2, 2, 1],
-    [1, 1, 1, 1, 1, 1]
-]).
-
-% Tie / Terminal
-testBoard3([
     [1, 2, 1, 2, 1, 2],
     [2, 1, 2, 1, 2, 1],
     [1, 2, 1, 2, 1, 2],
@@ -104,7 +71,7 @@ testBoard3([
 ]).
 
 % Terminal state but player 1 wins
-testBoard4([
+testBoard2([
     [2, 2, 1, 2, 1, 2],
     [2, 1, 2, 1, 2, 1],
     [1, 2, 1, 2, 1, 2],
@@ -114,7 +81,7 @@ testBoard4([
 ]).
 
 % Terminal state but player 2 wins
-testBoard5([
+testBoard3([
     [1, 1, 2, 1, 2, 1],
     [1, 2, 1, 2, 1, 2],
     [2, 1, 2, 1, 2, 1],
@@ -122,14 +89,6 @@ testBoard5([
     [2, 1, 2, 1, 2, 1],
     [1, 2, 1, 2, 1, 2]
 ]).
-
-testBoard6([[1, 1, 2, ., ., .], 
-        	[2, 1, 1, 2, 1, .],
-	    	[2, 2, 2, 2, 2, .], 
-	    	[2, 1, 1, 1, ., .], 
-            [., 1, 1, ., ., .], 
-	    	[1, ., ., ., ., .] ]).
-
 
 % DO NOT CHANGE THIS BLOCK OF COMMENTS.
 %
@@ -234,7 +193,8 @@ moves(Plyr, State, MvList) :-
 		[X,Y],
 		(between(0, 5, X), between(0, 5, Y), validmove(Plyr, State, [X,Y])),
 		MvList2
-	).
+	),
+    sort(MvList2, MvList).
 
 % DO NOT CHANGE THIS BLOCK OF COMMENTS.
 %
@@ -248,9 +208,13 @@ moves(Plyr, State, MvList) :-
 % Handles actual moves
 nextState(Player, [X, Y], State, NewState, NextPlayer) :-
     Player \= n, % Ensures it's not a pass move
-    oppositePlayer(Player, NextPlayer), % Gets the opponent
     set(State, InterimState, [X, Y], Player), % Places the player's stone
-    flipStones([X, Y], Player, InterimState, NewState). % Flips the opponent's stones
+    flipStones([X, Y], Player, InterimState, NewState), % Flips the opponent's stones
+    oppositePlayer(Player, Opponent),
+    (   hasMoves(Opponent, NewState)
+    ->  NextPlayer = Opponent
+    ;   NextPlayer = Player
+    ).
 
 % Handles pass moves
 nextState(Player, n, State, State, NextPlayer) :-
@@ -258,6 +222,11 @@ nextState(Player, n, State, State, NextPlayer) :-
 
 oppositePlayer(1, 2).
 oppositePlayer(2, 1).
+
+% Checks if there are any valid moves for the player
+hasMoves(Player, State) :-
+    moves(Player, State, Moves),
+    Moves \= [].
 
 % Flip stones in all directions
 flipStones([X, Y], Player, State, NewState) :-
@@ -289,16 +258,16 @@ tilesToFlip(Player, State, [X, Y], [DX, DY]) :-
 doFlip(Player, [X, Y], [DX, DY], State, NewState) :-
     in_bounds(X, Y),
     get(State, [X, Y], Tile),
-    oppositePlayer(Player, Tile),
-    set(State, InterState, [X, Y], Player),
-    NX is X + DX, NY is Y + DY,
-    doFlip(Player, [NX, NY], [DX, DY], InterState, NewState).
-doFlip(_, [X, Y], [DX, DY], State, NewState) :-
-    in_bounds(X, Y),
-    get(State, [X, Y], Player),
-    NX is X + DX, NY is Y + DY,
-    propagateFlip(Player, [NX, NY], [DX, DY], State, NewState).
-doFlip(_, _, _, State, State).
+    (   Tile == Player
+    ->  NewState = State  % Stop flipping if we encounter another player's stone
+    ;   Tile == '.' 
+    ->  NewState = State  % Stop flipping if we encounter an empty space
+    ;   oppositePlayer(Player, Tile),
+        set(State, InterState, [X, Y], Player),
+        NX is X + DX, NY is Y + DY,
+        doFlip(Player, [NX, NY], [DX, DY], InterState, NewState)
+    ).
+
 
 % Continue flipping in the same direction if in bounds and the tile is an opponent's tile
 propagateFlip(Player, [X, Y], [DX, DY], State, NewState) :-
@@ -320,13 +289,10 @@ in_bounds(X, Y) :-
     Y >= 0, Y < 6.
 
 % test_moves :-
-%     initialize(State, Player),
-%     nextState(Player, [3,3], State, State1, Player1),
-%     print('After move [1,3]:'), nl,
-%     showState(State1),
-%     nextState(Player1, [1,2], State1, State2, Player2),
-%     print('After move [1,2]:'), nl,
-%     showState(State2).
+%     testBoard1(State),
+%     nextState(2, [1,5], State, State1, Player1),
+%     print('After move:'), nl,
+%     showState(State1).
 
 % DO NOT CHANGE THIS BLOCK OF COMMENTS.
 %
@@ -346,16 +312,20 @@ validmove(Plyr, State, [X,Y]) :-
 can_flip(Plyr, State, [X,Y], [Dx,Dy], Found) :-
     NewX is X + Dx, % New X position
     NewY is Y + Dy, % New Y position
-	NewX >= 0, NewX < 6, % Check bounds
-	NewY >= 0, NewY < 6, % Check bounds
+    NewX >= 0, NewX < 6, % Check bounds
+    NewY >= 0, NewY < 6, % Check bounds
     get(State, [NewX,NewY], Cell),
     players(Plyr, Opponent),
-    (Found -> Cell = Plyr ; Cell = Opponent),
-    (Cell = Plyr ; can_flip(Plyr, State, [NewX,NewY], [Dx,Dy], true)).
+    (
+        Cell = Opponent, % If cell contains an opponent stone, continue in the same direction
+        can_flip(Plyr, State, [NewX, NewY], [Dx, Dy], true)
+        ; Cell = Plyr, Found % If cell contains a player stone and Found is true, succeed
+    ).
 
 % Define the other player.
 players(1, 2).
 players(2, 1).
+
 
 % DO NOT CHANGE THIS BLOCK OF COMMENTS.
 %

@@ -72,11 +72,12 @@
 % Note that lowerBound and upperBound are static properties of the 
 % game.  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
- 
- 
+
+:- ensure_loaded('othello.pl').
+
 %  MAIN PLAY ROUTINE 
  
-play :- initialize(InitState,Plyr), playgame(Plyr,InitState). 
+play :- initialize(InitState,Plyr), playgame(Plyr,InitState).
  
 % playgame(Plyr,State) - plays the game from State with Plyr moving first 
 % - tests for a winner; if not, get move from player, determine next State 
