@@ -361,7 +361,7 @@ h(State, Val) :-
 %   - returns a value B that is less than the actual or heuristic value
 %     of all states.
 
-lowerBound(-100).
+lowerBound(-101).
 
 % DO NOT CHANGE THIS BLOCK OF COMMENTS.
 %
@@ -371,7 +371,7 @@ lowerBound(-100).
 %   - returns a value B that is greater than the actual or heuristic value
 %     of all states.
 
-upperBound(100).
+upperBound(101).
 
 % DO NOT CHANGE THIS BLOCK OF COMMENTS.
 %
