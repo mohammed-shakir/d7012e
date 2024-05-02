@@ -168,5 +168,3 @@ upperBound(2).
 % notmember(E,L) is true if E is not a member of list L
 notmember(_,[]).
 notmember(N,[H|T]) :- N \= H, notmember(N,T).
-
-

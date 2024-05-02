@@ -8,7 +8,7 @@
 %
 /* ------------------------------------------------------- */
 
-%do not chagne the follwoing line!
+% do not chagne the follwoing line!
 :- ensure_loaded('play.pl').
 
 % DO NOT CHANGE THIS BLOCK OF COMMENTS.
@@ -268,7 +268,6 @@ doFlip(Player, [X, Y], [DX, DY], State, NewState) :-
         doFlip(Player, [NX, NY], [DX, DY], InterState, NewState)
     ).
 
-
 % Continue flipping in the same direction if in bounds and the tile is an opponent's tile
 propagateFlip(Player, [X, Y], [DX, DY], State, NewState) :-
     in_bounds(X, Y),
@@ -288,6 +287,7 @@ in_bounds(X, Y) :-
     X >= 0, X < 6,
     Y >= 0, Y < 6.
 
+% Test for nextState
 % test_moves :-
 %     testBoard1(State),
 %     nextState(2, [1,5], State, State1, Player1),
@@ -325,7 +325,6 @@ can_flip(Plyr, State, [X,Y], [Dx,Dy], Found) :-
 % Define the other player.
 players(1, 2).
 players(2, 1).
-
 
 % DO NOT CHANGE THIS BLOCK OF COMMENTS.
 %
@@ -473,4 +472,4 @@ setInList( [Element|RestList], [Element|NewRestList], Index, Value) :-
 	Index1 is Index-1, 
 	setInList( RestList, NewRestList, Index1, Value). 
 
-% set_prolog_flag(answer_write_options, [max_depth(0)])
+% set_prolog_flag(answer_write_options, [max_depth(0)])ayer who moves first. 

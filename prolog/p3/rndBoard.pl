@@ -17,6 +17,8 @@
 %
 % /Håkan Jonsson, LTU
 
+:- ensure_loaded('othello.pl').
+
 emptyBoardXYZ([[.,.,.,.,.,.], 
                [.,.,.,.,.,.],  
 	       [.,.,.,.,.,.], 

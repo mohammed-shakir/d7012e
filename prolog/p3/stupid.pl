@@ -14,6 +14,7 @@
 % automatically make random moves 
 
 :- use_module(library(random)).
+:- ensure_loaded('play.pl').
  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 % This script works like play.pl for the computer player. The
@@ -226,4 +227,3 @@ maxMove(V1,_,V2,M2,V2,M2) :- V1 < V2.
 %% Return the min of best so far and the current move. 
 minMove(V1,M1,V2,_,V1,M1) :- V1 =< V2. 
 minMove(V1,_,V2,M2,V2,M2) :- V1 > V2. 
- 
