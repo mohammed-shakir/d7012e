@@ -210,7 +210,7 @@ nextState(Player, [X, Y], State, NewState, NextPlayer) :-
     Player \= n, % Ensures it's not a pass move
     set(State, InterimState, [X, Y], Player), % Places the player's stone
     flipStones([X, Y], Player, InterimState, NewState), % Flips the opponent's stones
-    oppositePlayer(Player, Opponent),
+    oppositePlayer(Player, Opponent), % Switches to the opponent (if one player doesn't have moves, the other player will move)
     (   hasMoves(Opponent, NewState)
     ->  NextPlayer = Opponent
     ;   NextPlayer = Player
@@ -231,23 +231,23 @@ hasMoves(Player, State) :-
 % Flip stones in all directions
 flipStones([X, Y], Player, State, NewState) :-
     Directions = [[1,0], [-1,0], [0,1], [0,-1], [1,1], [1,-1], [-1,1], [-1,-1]],
-    foldl(flipDirection(Player, [X, Y]), Directions, State, NewState). % using foldl to flip in all directions
+    foldl(flipDirection(Player, [X, Y]), Directions, State, NewState). % Flip in all directions
 % foldl is true if NewState is the result of flipping in all directions
 
 % Helper to flip stones in a specific direction
 flipDirection(Player, [X, Y], [DX, DY], State, NewState) :-
-    NX is X + DX, NY is Y + DY,
-    canFlip(Player, State, [NX, NY], [DX, DY]), !,
-    doFlip(Player, [NX, NY], [DX, DY], State, NewState).
-flipDirection(_, _, _, State, State).
+    NX is X + DX, NY is Y + DY, % Calculate the next position
+    canFlip(Player, State, [NX, NY], [DX, DY]), !, % Check if flipping is possible
+    doFlip(Player, [NX, NY], [DX, DY], State, NewState). % Flip the stones
+flipDirection(_, _, _, State, State). % If flipping is not possible, return the same state
 
 % Check if flipping is possible in this direction
 canFlip(Player, State, [X, Y], [DX, DY]) :-
     in_bounds(X, Y),
     oppositePlayer(Player, Opponent),
     get(State, [X, Y], Opponent),
-    NX is X + DX, NY is Y + DY,
-    tilesToFlip(Player, State, [NX, NY], [DX, DY]).
+    NX is X + DX, NY is Y + DY, % Calculate the next position
+    tilesToFlip(Player, State, [NX, NY], [DX, DY]). % Check if there are tiles to flip
 
 % Recursively check if a tile can be flipped (end with a player's tile)
 tilesToFlip(Player, State, [X, Y], [DX, DY]) :-
