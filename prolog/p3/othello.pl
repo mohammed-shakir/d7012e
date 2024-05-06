@@ -231,7 +231,8 @@ hasMoves(Player, State) :-
 % Flip stones in all directions
 flipStones([X, Y], Player, State, NewState) :-
     Directions = [[1,0], [-1,0], [0,1], [0,-1], [1,1], [1,-1], [-1,1], [-1,-1]],
-    foldl(flipDirection(Player, [X, Y]), Directions, State, NewState).
+    foldl(flipDirection(Player, [X, Y]), Directions, State, NewState). % using foldl to flip in all directions
+% foldl is true if NewState is the result of flipping in all directions
 
 % Helper to flip stones in a specific direction
 flipDirection(Player, [X, Y], [DX, DY], State, NewState) :-
@@ -259,7 +260,7 @@ doFlip(Player, [X, Y], [DX, DY], State, NewState) :-
     in_bounds(X, Y),
     get(State, [X, Y], Tile),
     (   Tile == Player
-    ->  NewState = State  % Stop flipping if we encounter another player's stone
+    ->  NewState = State  % Stop flipping if we encounter our own tile
     ;   Tile == '.' 
     ->  NewState = State  % Stop flipping if we encounter an empty space
     ;   oppositePlayer(Player, Tile),
@@ -267,20 +268,6 @@ doFlip(Player, [X, Y], [DX, DY], State, NewState) :-
         NX is X + DX, NY is Y + DY,
         doFlip(Player, [NX, NY], [DX, DY], InterState, NewState)
     ).
-
-% Continue flipping in the same direction if in bounds and the tile is an opponent's tile
-propagateFlip(Player, [X, Y], [DX, DY], State, NewState) :-
-    in_bounds(X, Y),
-    get(State, [X, Y], Tile),
-    oppositePlayer(Player, Tile),
-    set(State, InterState, [X, Y], Player),
-    NX is X + DX, NY is Y + DY,
-    propagateFlip(Player, [NX, NY], [DX, DY], InterState, NewState).
-propagateFlip(_, [X, Y], [DX, DY], State, NewState) :-
-    in_bounds(X, Y),
-    get(State, [X, Y], Player),
-    NX is X + DX, NY is Y + DY,
-    doFlip(Player, [NX, NY], [DX, DY], State, NewState).
 
 % Bound check
 in_bounds(X, Y) :-
@@ -472,4 +459,4 @@ setInList( [Element|RestList], [Element|NewRestList], Index, Value) :-
 	Index1 is Index-1, 
 	setInList( RestList, NewRestList, Index1, Value). 
 
-% set_prolog_flag(answer_write_options, [max_depth(0)])ayer who moves first. 
+% set_prolog_flag(answer_write_options, [max_depth(0)])
